@@ -104,44 +104,44 @@ ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.locations ENABLE ROW LEVEL SECURITY;
 
 -- Families: any authenticated user in the family can read it
-CREATE POLICY "family_read" ON public.families
+CREATE OR REPLACE POLICY "family_read" ON public.families
   FOR SELECT USING (
     id = public.get_user_family_id()
   );
 
 -- Users: any authenticated family member can read family roster
 -- Uses SECURITY DEFINER function to avoid infinite recursion
-CREATE POLICY "users_read" ON public.users
+CREATE OR REPLACE POLICY "users_read" ON public.users
   FOR SELECT USING (
     family_id = public.get_user_family_id()
   );
 
 -- Tasks: family members can read/write tasks in their family
-CREATE POLICY "tasks_all" ON public.tasks
+CREATE OR REPLACE POLICY "tasks_all" ON public.tasks
   FOR ALL USING (
     family_id = public.get_user_family_id()
   );
 
 -- Task notes: family members can read/write notes on family tasks
-CREATE POLICY "notes_all" ON public.task_notes
+CREATE OR REPLACE POLICY "notes_all" ON public.task_notes
   FOR ALL USING (
     task_id IN (SELECT id FROM public.tasks WHERE family_id = public.get_user_family_id())
   );
 
 -- Notifications: users can read their own, write their own
-CREATE POLICY "notifications_read" ON public.notifications
+CREATE OR REPLACE POLICY "notifications_read" ON public.notifications
   FOR SELECT USING (user_id = auth.uid());
 
-CREATE POLICY "notifications_insert" ON public.notifications
+CREATE OR REPLACE POLICY "notifications_insert" ON public.notifications
   FOR INSERT WITH CHECK (user_id = auth.uid());
 
 -- Locations: family members can see each other's locations
-CREATE POLICY "locations_read" ON public.locations
+CREATE OR REPLACE POLICY "locations_read" ON public.locations
   FOR SELECT USING (
     user_id IN (SELECT id FROM public.users WHERE family_id = public.get_user_family_id())
   );
 
-CREATE POLICY "locations_write" ON public.locations
+CREATE OR REPLACE POLICY "locations_write" ON public.locations
   FOR ALL USING (user_id = auth.uid());
 
 -- ============================================================
