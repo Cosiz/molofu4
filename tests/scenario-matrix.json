@@ -1,0 +1,221 @@
+{
+  "product": "molofu3",
+  "roles": [
+    "Commander",
+    "Helper",
+    "Observer"
+  ],
+  "pain_points": [],
+  "features": [],
+  "verification_criteria": [
+    "VC-001: | Sarah can create a task in \u226430 seconds | Sarah | S1: quarterly meeting | dynamic | Timer test: cre",
+    "VC-010: | Today's tasks visible without scrolling | Maria | S2: morning, 7:15am | dynamic | Load app, measur",
+    "VC-020: | Dashboard loads in \u22642 seconds | Sarah | S2: 5pm, just left meeting | dynamic | Network timing, no ",
+    "VC-030: | One-tap marks task complete | Maria | S1: completed pickup | dynamic | Tap checkmark, verify statu"
+  ],
+  "scenarios": [
+    {
+      "id": "S001",
+      "category": "Create Task",
+      "role": "Commander",
+      "scenario": "Commander creates task via + button \u2014 happy path",
+      "expected": "PASS"
+    },
+    {
+      "id": "S002",
+      "category": "Create Task",
+      "role": "Helper",
+      "scenario": "Helper creates task via + button \u2014 happy path",
+      "expected": "PASS"
+    },
+    {
+      "id": "S003",
+      "category": "Create Task",
+      "role": "Observer",
+      "scenario": "Observer creates task via + button \u2014 happy path",
+      "expected": "PASS"
+    },
+    {
+      "id": "S004",
+      "category": "Task View",
+      "role": "Commander",
+      "scenario": "Commander sees their tasks on app open",
+      "expected": "PASS"
+    },
+    {
+      "id": "S005",
+      "category": "Task View",
+      "role": "Helper",
+      "scenario": "Helper sees their tasks on app open",
+      "expected": "PASS"
+    },
+    {
+      "id": "S006",
+      "category": "Task View",
+      "role": "Observer",
+      "scenario": "Observer sees their tasks on app open",
+      "expected": "PASS"
+    },
+    {
+      "id": "S007",
+      "category": "Notes",
+      "role": "Commander",
+      "scenario": "Commander adds a note to a task",
+      "expected": "PASS"
+    },
+    {
+      "id": "S008",
+      "category": "Notes",
+      "role": "Helper",
+      "scenario": "Helper adds a note to a task",
+      "expected": "PASS"
+    },
+    {
+      "id": "S009",
+      "category": "Notes",
+      "role": "Observer",
+      "scenario": "Observer adds a note to a task",
+      "expected": "PASS"
+    },
+    {
+      "id": "S010",
+      "category": "Task Completion",
+      "role": "Commander",
+      "scenario": "Commander marks task as complete",
+      "expected": "PASS"
+    },
+    {
+      "id": "S011",
+      "category": "Task Completion",
+      "role": "Helper",
+      "scenario": "Helper marks task as complete",
+      "expected": "PASS"
+    },
+    {
+      "id": "S012",
+      "category": "Task Completion",
+      "role": "Observer",
+      "scenario": "Observer marks task as complete",
+      "expected": "PASS"
+    },
+    {
+      "id": "S013",
+      "category": "Needs Help",
+      "role": "Commander",
+      "scenario": "Commander marks task as needs help",
+      "expected": "PASS"
+    },
+    {
+      "id": "S014",
+      "category": "Needs Help",
+      "role": "Helper",
+      "scenario": "Helper marks task as needs help",
+      "expected": "PASS"
+    },
+    {
+      "id": "S015",
+      "category": "Week/Calendar",
+      "role": "Commander",
+      "scenario": "Commander navigates to next day view",
+      "expected": "PASS"
+    },
+    {
+      "id": "S016",
+      "category": "Week/Calendar",
+      "role": "Commander",
+      "scenario": "Commander creates task for tomorrow",
+      "expected": "PASS"
+    },
+    {
+      "id": "S017",
+      "category": "Week/Calendar",
+      "role": "Commander",
+      "scenario": "No conflict when scheduling overlapping times",
+      "expected": "FAIL (gap)"
+    },
+    {
+      "id": "S018",
+      "category": "GPS/Location",
+      "role": "Commander",
+      "scenario": "Commander enters location as free text",
+      "expected": "PASS"
+    },
+    {
+      "id": "S019",
+      "category": "GPS/Location",
+      "role": "Helper",
+      "scenario": "Helper sees location on task",
+      "expected": "PASS"
+    },
+    {
+      "id": "S020",
+      "category": "GPS/Location",
+      "role": "Commander",
+      "scenario": "No GPS auto-detect button",
+      "expected": "FAIL (gap)"
+    },
+    {
+      "id": "S021",
+      "category": "GPS/Location",
+      "role": "Commander",
+      "scenario": "No Open in Maps from task detail",
+      "expected": "FAIL (gap)"
+    },
+    {
+      "id": "S022",
+      "category": "Observer",
+      "role": "Observer",
+      "scenario": "Observer sees family status summary",
+      "expected": "PASS"
+    },
+    {
+      "id": "S023",
+      "category": "Observer",
+      "role": "Commander",
+      "scenario": "Observer sends message to Commander",
+      "expected": "PASS"
+    },
+    {
+      "id": "S024",
+      "category": "Observer",
+      "role": "Observer",
+      "scenario": "Observer has no create task button",
+      "expected": "PASS"
+    },
+    {
+      "id": "S025",
+      "category": "Observer",
+      "role": "Observer",
+      "scenario": "Observer sees all family tasks",
+      "expected": "PASS"
+    },
+    {
+      "id": "S026",
+      "category": "Cross-Role",
+      "role": "Commander",
+      "scenario": "Role switch between any two roles",
+      "expected": "PASS"
+    },
+    {
+      "id": "S027",
+      "category": "Cross-Role",
+      "role": "Commander",
+      "scenario": "Dashboard loads in < 3s",
+      "expected": "PASS"
+    },
+    {
+      "id": "S028",
+      "category": "Cross-Role",
+      "role": "Commander",
+      "scenario": "Status badge visible per task",
+      "expected": "PASS"
+    },
+    {
+      "id": "S029",
+      "category": "Cross-Role",
+      "role": "Commander",
+      "scenario": "Stat cards show Done / In Progress / Needs Help",
+      "expected": "PASS"
+    }
+  ]
+}
