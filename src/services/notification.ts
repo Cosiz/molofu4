@@ -33,7 +33,7 @@ export function scheduleReminder(taskTitle: string, dueTime: string): void {
   if (reminderTime > now) {
     const delay = reminderTime.getTime() - now.getTime();
     setTimeout(() => {
-      showNotification('Molofu3 Reminder', `${taskTitle} is due in 15 minutes`);
+      showNotification('Molofu4 Reminder', `${taskTitle} is due in 15 minutes`);
     }, delay);
   }
 }
