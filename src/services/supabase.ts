@@ -1,13 +1,30 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = (import.meta.env as { VITE_SUPABASE_URL?: string }).VITE_SUPABASE_URL ?? '';
+const supabaseAnonKey = (import.meta.env as { VITE_SUPABASE_ANON_KEY?: string }).VITE_SUPABASE_ANON_KEY ?? '';
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
+// Lazy init — never throws at module load time
+let _supabase: SupabaseClient | null = null;
+
+function getClient(): SupabaseClient {
+  if (!_supabase) {
+    if (!supabaseUrl || !supabaseAnonKey) {
+      // Return a mockable client that fails gracefully — app still renders
+      _supabase = createClient('https://placeholder.supabase.co', 'placeholder');
+      return _supabase;
+    }
+    _supabase = createClient(supabaseUrl, supabaseAnonKey);
+  }
+  return _supabase;
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Proxy — all calls delegate to the lazy client
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const supabase: any = new Proxy({} as any, {
+  get(_target, prop) {
+    return getClient()[prop];
+  },
+});
 
 export const FAMILY_ID = '00000000-0000-0000-0000-000000000001';
 
