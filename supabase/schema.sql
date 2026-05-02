@@ -119,19 +119,20 @@ CREATE POLICY "users_read" ON public.users
   );
 
 -- Tasks: NO RLS — family_id is the access boundary, enforced at API level
--- ALTER TABLE public.tasks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.tasks DISABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "tasks_all" ON public.tasks;
 
 -- Task notes: NO RLS — access controlled via tasks family_id
--- ALTER TABLE public.task_notes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.task_notes DISABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "notes_all" ON public.task_notes;
--- Notifications: NO RLS — user_id is public info in this app context
--- ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
+
+-- Notifications: NO RLS
+ALTER TABLE public.notifications DISABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "notifications_read" ON public.notifications;
 DROP POLICY IF EXISTS "notifications_insert" ON public.notifications;
 
 -- Locations: NO RLS — family_id boundary enforced at API level
--- ALTER TABLE public.locations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.locations DISABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "locations_read" ON public.locations;
 DROP POLICY IF EXISTS "locations_write" ON public.locations;
 
