@@ -1,13 +1,13 @@
 {
-  "name": "molofu3",
-  "version": "3.7.2",
+  "name": "molofu4",
+  "version": "4.0.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "serve": "node server.cjs"
+    "start": "npx serve dist -l 3000"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.2",
