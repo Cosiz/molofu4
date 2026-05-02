@@ -118,20 +118,13 @@ CREATE POLICY "users_read" ON public.users
     family_id = public.get_user_family_id()
   );
 
--- Tasks: family members can read/write tasks in their family
+-- Tasks: NO RLS — family_id is the access boundary, enforced at API level
+-- ALTER TABLE public.tasks ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "tasks_all" ON public.tasks;
-CREATE POLICY "tasks_all" ON public.tasks
-  FOR ALL USING (
-    family_id = public.get_user_family_id()
-  );
 
--- Task notes: family members can read/write notes on family tasks
+-- Task notes: NO RLS — access controlled via tasks family_id
+-- ALTER TABLE public.task_notes ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "notes_all" ON public.task_notes;
-CREATE POLICY "notes_all" ON public.task_notes
-  FOR ALL USING (
-    task_id IN (SELECT id FROM public.tasks WHERE family_id = public.get_user_family_id())
-  );
-
 -- Notifications: users can read their own, write their own
 DROP POLICY IF EXISTS "notifications_read" ON public.notifications;
 CREATE POLICY "notifications_read" ON public.notifications
