@@ -1,31 +1,38 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store';
+import { OfflineBanner } from '../components/OfflineBanner';
+import { NotificationBell } from '../components/NotificationBell';
+import { GPSBanner } from '../components/GPSBanner';
+import { ConflictModal } from '../components/ConflictModal';
 
 export function CommanderDashboard() {
-  const { setUser, todaysTasks, tasksForDate, addTask } = useStore();
+  const { setUser, todaysTasks, tasksForDate, addTask, loadTasks, detectConflicts, family } = useStore();
   const navigate = useNavigate();
   const [showCreate, setShowCreate] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [assignee, setAssignee] = useState('u2');
+  const [assignee, setAssignee] = useState('00000000-0000-0000-0000-000000000002');
   const [dueTime, setDueTime] = useState('17:00');
   const [location, setLocation] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [showConflicts, setShowConflicts] = useState(false);
+  const [gpsCoords, setGpsCoords] = useState<{ lat: number; lng: number } | null>(null);
 
-  // weekStart stored in state so prev/next navigate correctly
   const [weekStart, setWeekStart] = useState(() => {
     const s = new Date();
     s.setDate(s.getDate() - s.getDay());
     return s.toISOString().split('T')[0];
   });
 
-  useEffect(() => { setUser({ id: 'u1', name: 'Sarah Chen', role: 'commander' }); }, []);
+  useEffect(() => {
+    setUser({ id: '00000000-0000-0000-0000-000000000001', name: 'Sarah Chen', role: 'commander' });
+    loadTasks();
+  }, []);
 
   const today = new Date().toISOString().split('T')[0];
   const tasks = selectedDate === today ? todaysTasks() : tasksForDate(selectedDate);
 
-  // Build 7-day strip from weekStart
   const weekDays = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(weekStart);
     d.setDate(d.getDate() + i);
@@ -38,15 +45,16 @@ export function CommanderDashboard() {
     setWeekStart(s.toISOString().split('T')[0]);
     setSelectedDate(s.toISOString().split('T')[0]);
   }
+
   function nextWeek() {
     const s = new Date(weekStart);
     s.setDate(s.getDate() + 7);
     setWeekStart(s.toISOString().split('T')[0]);
     setSelectedDate(s.toISOString().split('T')[0]);
   }
+
   function selectDay(d: string) {
     setSelectedDate(d);
-    // Snap weekStart to the week containing the selected day
     const sd = new Date(d);
     sd.setDate(sd.getDate() - sd.getDay());
     setWeekStart(sd.toISOString().split('T')[0]);
@@ -67,6 +75,22 @@ export function CommanderDashboard() {
     return o[a.status] - o[b.status];
   });
 
+  // Conflict detection for week
+  const weekConflicts = detectConflicts(weekStart);
+  const conflictDates = new Set(weekConflicts.map(c => c.date));
+
+  // Conflict badge on selected day
+  const selectedDayConflicts = weekConflicts.filter(c => c.date === selectedDate);
+
+  function handleDismissConflicts() {
+    setShowConflicts(false);
+  }
+
+  function handleReassignFromConflict(taskId: string) {
+    setShowConflicts(false);
+    navigate(`/task/${taskId}`);
+  }
+
   function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!title.trim()) return;
@@ -74,78 +98,116 @@ export function CommanderDashboard() {
       title: title.trim(),
       description: description.trim(),
       assigneeId: assignee,
-      assigneeName: assignee === 'u2' ? 'Maria Santos' : 'David Chen',
+      assigneeName: family.members.find(m => m.id === assignee)?.name ?? assignee,
       dueTime,
       dueDate: selectedDate,
       location,
       contact: '',
       status: 'pending',
-      createdBy: 'u1',
+      createdBy: '00000000-0000-0000-0000-000000000001',
     });
-    setTitle(''); setDescription(''); setDueTime('17:00'); setLocation('');
+    setTitle('');
+    setDescription('');
+    setDueTime('17:00');
+    setLocation('');
     setShowCreate(false);
   }
 
   return (
     <div className="dashboard">
       <div className="dash-header">
-        <h1>Good morning, Sarah</h1>
-        <p>Chen Family</p>
-        <div className="badge">Commander</div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div>
+            <h1>Good morning, Sarah</h1>
+            <p>Chen Family</p>
+            <div className="badge">Commander</div>
+          </div>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <NotificationBell />
+          </div>
+        </div>
       </div>
+
       <div className="dash-body">
+        <OfflineBanner />
+
+        {/* GPS Banner */}
+        <GPSBanner
+          userId="00000000-0000-0000-0000-000000000001"
+          onLocationUpdate={(lat, lng) => setGpsCoords({ lat, lng })}
+        />
+
+        {/* Week Strip */}
         <div className="dash-card">
           <div className="week-strip">
-            <button className="week-nav-btn" onClick={prevWeek}>‹</button>
+            <button className="week-nav-btn" onClick={prevWeek} aria-label="Previous week">‹</button>
             {weekDays.map((d) => {
               const { label, num } = formatDayLabel(d);
               const isSelected = d === selectedDate;
               const isToday = d === today;
+              const hasConflict = conflictDates.has(d);
               return (
                 <button
                   key={d}
-                  className={`week-day ${isSelected ? 'week-day-selected' : ''} ${isToday ? 'week-day-today' : ''}`}
+                  className={`week-day ${isSelected ? 'week-day-selected' : ''} ${isToday && !isSelected ? 'week-day-today' : ''}`}
                   onClick={() => selectDay(d)}
+                  aria-label={`${label} ${num}${hasConflict ? ', has conflict' : ''}`}
                 >
                   <span className="week-day-label">{label}</span>
                   <span className="week-day-num">{num}</span>
+                  {hasConflict && <span style={{ position: 'absolute', top: 2, right: 2, fontSize: 10 }}>⚠️</span>}
                 </button>
               );
             })}
-            <button className="week-nav-btn" onClick={nextWeek}>›</button>
+            <button className="week-nav-btn" onClick={nextWeek} aria-label="Next week">›</button>
           </div>
         </div>
 
-        <div className="dash-card">
-          <div className="gps-banner">
-            📍 GPS tracking — <span className="gps-coming-soon">coming soon</span>
+        {/* Conflict banner */}
+        {selectedDayConflicts.length > 0 && (
+          <div className="dash-card">
+            <div style={{ background: '#FEF3C7', border: '1.5px solid #F59E0B', borderRadius: 10, padding: '10px 14px' }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#92400E' }}>
+                ⚠️ {selectedDayConflicts[0].tasks.length} task{selectedDayConflicts[0].tasks.length > 1 ? 's' : ''} overlap on this day
+              </div>
+              <button
+                onClick={() => setShowConflicts(true)}
+                style={{ background: 'none', border: 'none', color: '#D97706', fontSize: 12, fontWeight: 600, cursor: 'pointer', padding: 0, marginTop: 2 }}
+              >
+                View conflicts →
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
+        {/* Stat Cards */}
         <div className="dash-card">
           <div className="stat-row">
             <div className="stat-card">
-              <div className="stat-num">{completed}/{tasks.length}</div>
+              <div className="stat-num" style={{ color: '#16A34A' }}>{completed}</div>
               <div className="stat-label">Done today</div>
             </div>
             <div className="stat-card">
               <div className="stat-num">{pending}</div>
-              <div className="stat-label">In progress</div>
+              <div className="stat-label">Remaining</div>
             </div>
             <div className="stat-card">
-              <div className="stat-num" style={{ color: needsHelp > 0 ? 'var(--primary)' : 'inherit' }}>{needsHelp}</div>
+              <div className="stat-num" style={{ color: needsHelp > 0 ? '#DC2626' : 'inherit' }}>{needsHelp}</div>
               <div className="stat-label">Needs help</div>
             </div>
           </div>
         </div>
 
+        {/* Task List */}
         <div className="dash-card">
-          <div className="section-title">Today's Tasks</div>
+          <div className="section-title">
+            {selectedDate === today ? "Today's Tasks" : new Date(selectedDate + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+          </div>
           <div className="scroll-list">
             {sorted.length === 0 ? (
               <div className="empty">
                 <span className="empty-icon">📋</span>
-                <h3>No tasks yet</h3>
+                <h3>No tasks</h3>
                 <p>Tap + to assign your first task</p>
               </div>
             ) : sorted.map((task) => (
@@ -181,7 +243,7 @@ export function CommanderDashboard() {
         </div>
       </div>
 
-      <button className="fab" onClick={() => setShowCreate(true)}>+</button>
+      <button className="fab" onClick={() => setShowCreate(true)} aria-label="Create new task">+</button>
 
       {showCreate && (
         <div className="modal-overlay" onClick={() => setShowCreate(false)}>
@@ -201,8 +263,8 @@ export function CommanderDashboard() {
                 <div className="form-group">
                   <label>Assign to</label>
                   <select value={assignee} onChange={(e) => setAssignee(e.target.value)}>
-                    <option value="u2">Maria Santos</option>
-                    <option value="u3">David Chen</option>
+                    <option value="00000000-0000-0000-0000-000000000002">Maria Santos</option>
+                    <option value="00000000-0000-0000-0000-000000000003">David Chen</option>
                   </select>
                 </div>
                 <div className="form-group">
@@ -215,11 +277,19 @@ export function CommanderDashboard() {
                 <input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="e.g. Kowloon Cricket Club, Gate B" />
               </div>
               <button type="submit" className="btn-primary">
-                Send to {assignee === 'u2' ? 'Maria' : 'David'}
+                Send to {assignee === '00000000-0000-0000-0000-000000000002' ? 'Maria' : 'David'}
               </button>
             </form>
           </div>
         </div>
+      )}
+
+      {showConflicts && (
+        <ConflictModal
+          conflicts={selectedDayConflicts}
+          onDismiss={handleDismissConflicts}
+          onReassign={handleReassignFromConflict}
+        />
       )}
     </div>
   );

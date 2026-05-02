@@ -22,6 +22,8 @@ export interface Task {
   notes: TaskNote[];
   createdAt: string;
   createdBy: string;
+  gps_lat?: number;
+  gps_lng?: number;
 }
 
 export interface TaskNote {

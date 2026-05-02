@@ -1,12 +1,17 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store';
+import { OfflineBanner } from '../components/OfflineBanner';
+import { GPSBanner } from '../components/GPSBanner';
 
 export function HelperDashboard() {
-  const { setUser, myTasks, completeTask } = useStore();
+  const { setUser, myTasks, completeTask, loadTasks } = useStore();
   const navigate = useNavigate();
 
-  useEffect(() => { setUser({ id: 'u2', name: 'Maria Santos', role: 'helper' }); }, []);
+  useEffect(() => {
+    setUser({ id: '00000000-0000-0000-0000-000000000002', name: 'Maria Santos', role: 'helper' });
+    loadTasks();
+  }, []);
 
   const tasks = myTasks().filter((t) => t.status !== 'completed');
   const sorted = [...tasks].sort((a, b) => {
@@ -22,6 +27,10 @@ export function HelperDashboard() {
         <div className="badge">Helper</div>
       </div>
       <div className="dash-body">
+        <OfflineBanner />
+
+        <GPSBanner userId="00000000-0000-0000-0000-000000000002" />
+
         <div className="dash-card">
           <div className="section-title">Your Tasks — {tasks.length} remaining</div>
           <div className="scroll-list">

@@ -1,9 +1,0 @@
-{
-  "$schema": "https://zeabur.com/schemas/zeabur.json",
-  "build": {
-    "command": "npm install && npm run build"
-  },
-  "start": {
-    "command": "node server.cjs"
-  }
-}

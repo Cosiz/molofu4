@@ -1,18 +1,21 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useStore } from '../store';
+import { supabase } from '../services/supabase';
 
 export function TaskDetail() {
   const { id } = useParams<{ id: string }>();
-  const { tasks, completeTask, addNote } = useStore();
+  const { tasks, completeTask, addNote, updateStatus } = useStore();
   const navigate = useNavigate();
   const [note, setNote] = useState('');
 
   const task = tasks.find((t) => t.id === id);
   if (!task) return null;
 
-  const isHelper = useStore.getState().currentUser?.role === 'helper';
-  const isObserver = useStore.getState().currentUser?.role === 'observer';
+  const currentUser = useStore.getState().currentUser;
+  const isHelper = currentUser?.role === 'helper';
+  const isObserver = currentUser?.role === 'observer';
+  const isCommander = currentUser?.role === 'commander';
 
   const statusLabels: Record<string, string> = {
     pending: '○ Pending',
@@ -21,8 +24,17 @@ export function TaskDetail() {
     needs_help: '⚠️ Needs help',
   };
 
-  function handleComplete() {
-    completeTask(task.id);
+  async function handleComplete() {
+    await completeTask(task.id);
+    navigate(-1);
+  }
+
+  async function handleNeedsHelp() {
+    await updateStatus(task.id, 'needs_help');
+  }
+
+  async function handleReassign(newAssigneeId: string) {
+    await supabase.rpc('reassign_task', { task_id: task.id, new_assignee_id: newAssigneeId }).catch(() => {});
     navigate(-1);
   }
 
@@ -31,6 +43,21 @@ export function TaskDetail() {
     addNote(task.id, note.trim());
     setNote('');
   }
+
+  const FAMILY_MEMBERS = [
+    { id: '00000000-0000-0000-0000-000000000001', name: 'Sarah Chen' },
+    { id: '00000000-0000-0000-0000-000000000002', name: 'Maria Santos' },
+    { id: '00000000-0000-0000-0000-000000000003', name: 'David Chen' },
+  ];
+
+  // Map thumbnail via OSM
+  const mapUrl = task.gps_lat && task.gps_lng
+    ? `https://www.openstreetmap.org/export/embed.html?bbox=${task.gps_lng - 0.005},${task.gps_lat - 0.003},${task.gps_lng + 0.005},${task.gps_lat + 0.003}&layer=mapnik&marker=${task.gps_lat},${task.gps_lng}`
+    : null;
+
+  const mapsUrl = task.gps_lat && task.gps_lng
+    ? `https://www.google.com/maps?q=${task.gps_lat},${task.gps_lng}`
+    : null;
 
   return (
     <div className="dashboard">
@@ -43,6 +70,7 @@ export function TaskDetail() {
           </div>
         </div>
       </div>
+
       <div className="dash-body">
         <div className="dash-card">
           <div style={{ marginBottom: 12 }}>
@@ -75,6 +103,27 @@ export function TaskDetail() {
               <div className="detail-value">📞 {task.contact}</div>
             </div>
           )}
+          {mapUrl && (
+            <div className="detail-section">
+              <div className="detail-label">Map</div>
+              <div style={{ borderRadius: 8, overflow: 'hidden', marginTop: 4 }}>
+                <iframe
+                  title="Location map"
+                  width="100%"
+                  height="160"
+                  src={mapUrl}
+                  style={{ border: 0, display: 'block' }}
+                  loading="lazy"
+                />
+              </div>
+              {mapsUrl && (
+                <a href={mapsUrl} target="_blank" rel="noopener noreferrer"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginTop: 8, fontSize: 13, color: '#3B82F6', fontWeight: 600 }}>
+                  📍 Open in Maps
+                </a>
+              )}
+            </div>
+          )}
         </div>
 
         {task.notes.length > 0 && (
@@ -90,21 +139,63 @@ export function TaskDetail() {
           </div>
         )}
 
-        {!isObserver && task.status !== 'completed' && (
+        {task.status !== 'completed' && (
           <>
-            <button className="complete-btn" onClick={handleComplete}>
-              ✓ Mark as Complete
-            </button>
-            <div className="note-input-wrap">
-              <input
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                placeholder="Ask a question or leave a note..."
-                onKeyDown={(e) => e.key === 'Enter' && handleAddNote()}
-              />
-              <button className="note-send-btn" onClick={handleAddNote}>Send</button>
-            </div>
+            {(isCommander || isHelper || isObserver) && (
+              <>
+                <div className="note-input-wrap">
+                  <input
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    placeholder="Ask a question or leave a note..."
+                    onKeyDown={(e) => e.key === 'Enter' && handleAddNote()}
+                  />
+                  <button className="note-send-btn" onClick={handleAddNote}>Send</button>
+                </div>
+
+                {(isCommander || isHelper) && (
+                  <button className="complete-btn" onClick={handleComplete}>
+                    ✓ Mark as Complete
+                  </button>
+                )}
+
+                {isHelper && (
+                  <button
+                    className="complete-btn"
+                    style={{ background: '#F59E0B', marginTop: 8 }}
+                    onClick={handleNeedsHelp}
+                  >
+                    🆘 Flag Needs Help
+                  </button>
+                )}
+              </>
+            )}
           </>
+        )}
+
+        {isObserver && task.status !== 'completed' && (
+          <div style={{ marginTop: 12 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#57534E', marginBottom: 8 }}>Reassign to:</div>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              {FAMILY_MEMBERS.filter(m => m.id !== currentUser?.id).map(m => (
+                <button
+                  key={m.id}
+                  onClick={() => handleReassign(m.id)}
+                  style={{
+                    padding: '8px 16px',
+                    background: 'white',
+                    border: '1.5px solid #E7E5E4',
+                    borderRadius: 8,
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  👤 {m.name}
+                </button>
+              ))}
+            </div>
+          </div>
         )}
       </div>
     </div>

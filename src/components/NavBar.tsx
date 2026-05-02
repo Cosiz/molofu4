@@ -4,18 +4,16 @@ import { colors, typography, spacing, shadow, touchTarget } from '../theme';
 
 const navItems: Record<string, { icon: string; label: string; path: string }[]> = {
   commander: [
-    { icon: '📊', label: 'Dashboard', path: '/dashboard' },
+    { icon: '📊', label: 'Dashboard', path: '/commander' },
     { icon: '📋', label: 'Tasks', path: '/tasks' },
     { icon: '💬', label: 'Messages', path: '/messages' },
-    { icon: '📅', label: 'Schedule', path: '/schedule' },
-    { icon: '⚙️', label: 'Settings', path: '/settings' },
   ],
   helper: [
-    { icon: '📋', label: 'My Tasks', path: '/tasks' },
+    { icon: '📋', label: 'My Tasks', path: '/helper' },
     { icon: '💬', label: 'Messages', path: '/messages' },
   ],
   observer: [
-    { icon: '📍', label: 'Status', path: '/dashboard' },
+    { icon: '📍', label: 'Status', path: '/observer' },
     { icon: '📜', label: 'Feed', path: '/messages' },
   ],
 };

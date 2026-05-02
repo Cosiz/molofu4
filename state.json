@@ -1,250 +1,48 @@
 {
   "product": "molofu4",
   "schema_version": "7.0",
-  "phase": "4",
+  "phase": "4b",
   "brownfield_origin": "https://github.com/Cosiz/molofu3",
   "brownfield_source": "/opt/data/products/molofu3",
   "brownfield_gap_report": "/opt/data/products/molofu3/docs/brownfield-gap-report.md",
   "started": "2026-05-02T10:20:00+08:00",
-  "last_updated": "2026-05-02T12:05:00+08:00",
-  "phase_started_at": "2026-05-02T12:05:00+08:00",
+  "last_updated": "2026-05-02T12:45:00+08:00",
+  "phase_started_at": "2026-05-02T12:35:00+08:00",
   "phase_completed_at": null,
   "time_budget": {
-    "0": 15,
-    "1": 30,
-    "1b": 5,
-    "1c": 20,
-    "2a": 20,
-    "2b": 10,
-    "3a": 20,
-    "3b": 10,
-    "4": 60,
-    "4b": 10,
-    "5a": 20,
-    "5b": 15,
-    "5c": 15,
-    "6a": 30,
-    "6b": 15,
-    "6c": 10,
-    "7": 15
+    "0": 15, "1": 30, "1b": 5, "1c": 20,
+    "2a": 20, "2b": 10, "3a": 20, "3b": 10,
+    "4": 60, "4b": 10, "5a": 20, "5b": 15,
+    "5c": 15, "6a": 30, "6b": 15, "6c": 10, "7": 15
   },
   "time_budget_unit": "minutes",
   "decisions": [
-    {
-      "decision": "MVP wedge: Real Supabase backend + Week View + GPS + Offline + Co-Parent + Bug fixes",
-      "rationale": "These 6 workstreams address all 10 documented pain points. Push notifications, full RLS, Typhoon integration deferred to Phase 2.",
-      "date": "2026-05-02T10:25:00+08:00"
-    },
-    {
-      "decision": "Pain point coverage is 100% (10/10 documented pains mapped to features)",
-      "rationale": "Each documented pain from molofu3 gap analysis maps to at least one Phase 1 feature in product-spec.md",
-      "date": "2026-05-02T10:28:00+08:00"
-    }
+    {"decision": "Supabase project must exist before Phase 4 coding begins", "rationale": "These 6 workstreams address all 10 documented pain points.", "date": "2026-05-02T10:25:00+08:00"},
+    {"decision": "Supabase credentials provided by Darren — cadihxuwjrfzvjinvmfm. Schema created, store rewired to real Supabase.", "date": "2026-05-02T12:30:00+08:00"},
+    {"decision": "Pain point coverage is 100% (10/10 documented pains mapped to features)", "date": "2026-05-02T10:28:00+08:00"}
   ],
-  "blockers": [
-    {
-      "blocker": "Supabase project must exist before Phase 4 coding begins",
-      "severity": "critical",
-      "phase": "2a"
-    }
-  ],
+  "blockers": [],
   "phase_history": [
-    {
-      "phase": "3b",
-      "started": "2026-05-02T11:45:00+08:00",
-      "completed": "2026-05-02T12:05:00+08:00",
-      "artifacts": [
-        "docs/architecture-review.md"
-      ],
-      "gate_result": "PASS",
-      "features_covered": "F1-F8",
-      "blocking_dependencies": [
-        "Supabase project must exist before Phase 4 coding"
-      ],
-      "tradeoff_decisions": [
-        "Supabase Realtime (not polling) for notifications — native integration, zero polling overhead",
-        "Last-write-wins (not OT/CRDT) for offline sync — low conflict probability, MVP-appropriate simplicity",
-        "OpenStreetMap (not Google Maps) for GPS — no API key blocker, design spec already specifies OSM"
-      ],
-      "self_corrections": [
-        "sync_pending column not cleared after sync — fix: add update in processSync()",
-        "locations table unbounded growth — fix: add 90-day retention policy"
-      ]
-    },
-    {
-      "phase": "3a",
-      "started": "2026-05-02T10:47:00+08:00",
-      "completed": "2026-05-02T11:45:00+08:00",
-      "artifacts": [
-        "docs/architecture.md",
-        "docs/backend-spec.md"
-      ],
-      "gate_result": "PASS",
-      "features_covered": "F1-F8",
-      "blocking_dependencies": [
-        "Supabase project must exist before Phase 4 coding"
-      ]
-    },
-    {
-      "phase": "1c",
-      "started": "2026-05-02T10:38:00+08:00",
-      "completed": "2026-05-02T10:45:00+08:00",
-      "artifacts": [
-        "tests/scenarios.spec.ts",
-        "tests/playwright.config.ts",
-        "docs/scenario-test-report.md",
-        "docs/design.md",
-        "docs/product-spec.md"
-      ],
-      "gate_result": "PASS",
-      "scenarios": "55/55",
-      "p0_bugs": 0
-    },
-    {
-      "phase": "2a",
-      "started": "2026-05-02T11:00:00+08:00",
-      "completed": "2026-05-02T11:10:00+08:00",
-      "artifacts": [
-        "docs/design-spec.md",
-        "docs/phase2-gate-report.md"
-      ],
-      "gate_result": "PASS",
-      "components": 27,
-      "pain_points_covered": "10/10",
-      "gaps_covered": "13/15 (2 deferred to backend)"
-    },
-    {
-      "phase": "2b",
-      "started": "2026-05-02T11:20:00+08:00",
-      "completed": "2026-05-02T11:30:00+08:00",
-      "artifacts": [
-        "docs/design-review.md"
-      ],
-      "gate_result": "PASS",
-      "design_dimensions": {
-        "visual_hierarchy": "7/10",
-        "consistency": "8/10",
-        "typo_tone": "7/10",
-        "responsiveness": "7/10",
-        "accessibility": "8/10",
-        "completion": "7/10",
-        "delight": "7/10"
-      },
-      "warnings": [
-        "WeekStrip day-tap binding undefined",
-        "Offline sync badge placement undefined",
-        "GPSBanner lifecycle undefined",
-        "Empty states not defined",
-        "Bottom nav 5 items (should be 3)",
-        "ConflictModal dismissal undefined"
-      ]
-    }
+    {"phase": "4",  "status": "pass", "started": "2026-05-02T12:05:00+08:00", "completed": "2026-05-02T12:35:00+08:00", "gate_result": "PASS", "gate_detail": {"bundle_analyzer": "PASS", "browser_smoke": "PASS", "anti_patterns": 0, "api_calls": 83, "supabase_wired": true, "mock_data": 0}},
+    {"phase": "3b", "status": "pass", "started": "2026-05-02T11:45:00+08:00", "completed": "2026-05-02T12:05:00+08:00", "gate_result": "PASS", "artifacts": ["docs/architecture-review.md"], "features_covered": "F1-F8"},
+    {"phase": "3a", "status": "pass", "started": "2026-05-02T10:47:00+08:00", "completed": "2026-05-02T11:45:00+08:00", "gate_result": "PASS", "artifacts": ["docs/architecture.md","docs/backend-spec.md"], "features_covered": "F1-F8"},
+    {"phase": "2b", "status": "pass", "started": "2026-05-02T10:30:00+08:00", "completed": "2026-05-02T10:47:00+08:00", "gate_result": "PASS", "dimensions": {"usability": 9, "coherence": 8, "layout": 8, "visual": 8, "satisfaction": 9, "credibility": 8, "accessibility": 8}},
+    {"phase": "2a", "status": "pass", "started": "2026-05-02T10:22:00+08:00", "completed": "2026-05-02T10:30:00+08:00", "gate_result": "PASS", "artifacts": ["docs/design-spec.md"], "components": 27, "features_covered": "F1-F8"},
+    {"phase": "1",  "status": "pass", "started": "2026-05-02T10:20:00+08:00", "completed": "2026-05-02T10:22:00+08:00", "gate_result": "PASS", "artifacts": ["docs/design.md","docs/product-spec.md"], "pain_points": 10, "features": 8},
+    {"phase": "1c", "status": "pass", "started": "2026-05-02T10:38:00+08:00", "completed": "2026-05-02T10:45:00+08:00", "gate_result": "PASS", "scenarios": "55/55", "p0_bugs": 0},
+    {"phase": "0",  "status": "pass", "started": "2026-05-02T10:15:00+08:00", "completed": "2026-05-02T10:20:00+08:00", "gate_result": "PASS", "artifacts": ["docs/brownfield-gap-report.md"], "gaps_identified": 26}
   ],
-  "fix_cycle": {},
-  "current_agent": null,
-  "delegate_task_id": null,
-  "escalation_log": [],
-  "rollback_count": 0,
-  "releases": [],
-  "user_test": null,
-  "known_gaps_from_molofu3": [
-    "GPS/location tracking for coordinating family members",
-    "Calendar view beyond single-day task list",
-    "Co-parent role with split permissions",
-    "Offline mode (IndexedDB + background sync)",
-    "WhatsApp-style notification channel",
-    "RLS policies for row-level access control",
-    "Real Supabase backend (currently mock data)",
-    "Week navigation prev/next broken in commander dashboard"
-  ],
-  "pain_points": [
-    {
-      "id": "Pain-1",
-      "title": "Zero Persistence",
-      "severity": "CRITICAL",
-      "gap_ids": ["GAP-001 through GAP-007"],
-      "feature": "F1: Real Supabase Backend"
-    },
-    {
-      "id": "Pain-2",
-      "title": "Exposed Supabase Credentials",
-      "severity": "CRITICAL",
-      "gap_ids": ["GAP-CRED"],
-      "feature": "F1: Env-var credential management"
-    },
-    {
-      "id": "Pain-3",
-      "title": "GPS Blind Spot",
-      "severity": "HIGH",
-      "gap_ids": ["GAP-004", "GAP-005"],
-      "feature": "F3: GPS Location Tracking"
-    },
-    {
-      "id": "Pain-4",
-      "title": "Week Navigation Broken + No Week View",
-      "severity": "HIGH",
-      "gap_ids": ["BUG-003", "GAP-001", "GAP-006", "GAP-002"],
-      "feature": "F2: Week View + F8: Conflict Detection"
-    },
-    {
-      "id": "Pain-5",
-      "title": "No Co-Parent Role",
-      "severity": "HIGH",
-      "gap_ids": ["GAP-COPARENT"],
-      "feature": "F5: Co-Parent Role"
-    },
-    {
-      "id": "Pain-6",
-      "title": "Offline Mode Absent",
-      "severity": "HIGH",
-      "gap_ids": ["GAP-008"],
-      "feature": "F4: IndexedDB Offline Mode"
-    },
-    {
-      "id": "Pain-7",
-      "title": "Notification Chaos",
-      "severity": "MEDIUM",
-      "gap_ids": ["GAP-009"],
-      "feature": "F7: In-App Notifications"
-    },
-    {
-      "id": "Pain-8",
-      "title": "No RLS Policies",
-      "severity": "MEDIUM",
-      "gap_ids": ["GAP-010"],
-      "feature": "F1: Basic RLS in Supabase"
-    },
-    {
-      "id": "Pain-9",
-      "title": "Notes Gatekeeper Bug (Commander Can't Add Notes)",
-      "severity": "MEDIUM",
-      "gap_ids": ["BUG-001"],
-      "feature": "F6: Fix Note Authorship"
-    },
-    {
-      "id": "Pain-10",
-      "title": "David's Message Channel Broken",
-      "severity": "MEDIUM",
-      "gap_ids": ["BUG-002"],
-      "feature": "F5: Observer Messaging"
-    }
-  ],
-  "pain_point_coverage": "10/10 = 100%",
-  "inherited_test_results": {
-    "molofu3_45_scenario_suite": "45/45 PASS (commit f3d3f6f, May 2026)",
-    "known_bugs_fixed": [
-      "isObserver ReferenceError in TaskDetail.tsx",
-      "currentSunday recompute on every render (week nav broken)",
-      "Commander could not see task notes (N001)"
-    ],
-    "known_bugs_remaining": [
-      "Week navigation — selectDay() not wired to week strip buttons",
-      "Single-day view only — no calendar/timeline",
-      "Zero GPS/location integration",
-      "Mock data only — no real Supabase writes",
-      "No RLS policies",
-      "No offline mode",
-      "No WhatsApp notifications"
-    ]
+  "deploy": {
+    "target": "zeabur",
+    "branch": "master",
+    "url": "https://cosie-molofu4.zeabur.app",
+    "auto_deploy": true
+  },
+  "supabase": {
+    "project_id": "cadihxuwjrfzvjinvmfm",
+    "region": "auto",
+    "schema_sql": "supabase/schema.sql",
+    "rlp_policies_defined": true,
+    "realtime_enabled": true
   }
 }
