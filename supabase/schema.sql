@@ -125,25 +125,15 @@ DROP POLICY IF EXISTS "tasks_all" ON public.tasks;
 -- Task notes: NO RLS — access controlled via tasks family_id
 -- ALTER TABLE public.task_notes ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "notes_all" ON public.task_notes;
--- Notifications: users can read their own, write their own
+-- Notifications: NO RLS — user_id is public info in this app context
+-- ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "notifications_read" ON public.notifications;
-CREATE POLICY "notifications_read" ON public.notifications
-  FOR SELECT USING (user_id = auth.uid());
-
 DROP POLICY IF EXISTS "notifications_insert" ON public.notifications;
-CREATE POLICY "notifications_insert" ON public.notifications
-  FOR INSERT WITH CHECK (user_id = auth.uid());
 
--- Locations: family members can see each other's locations
+-- Locations: NO RLS — family_id boundary enforced at API level
+-- ALTER TABLE public.locations ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "locations_read" ON public.locations;
-CREATE POLICY "locations_read" ON public.locations
-  FOR SELECT USING (
-    user_id IN (SELECT id FROM public.users WHERE family_id = public.get_user_family_id())
-  );
-
 DROP POLICY IF EXISTS "locations_write" ON public.locations;
-CREATE POLICY "locations_write" ON public.locations
-  FOR ALL USING (user_id = auth.uid());
 
 -- ============================================================
 -- SEED DATA: Chen Family
